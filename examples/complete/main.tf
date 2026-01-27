@@ -38,6 +38,20 @@ data "google_compute_image" "ubuntu" {
 }
 
 # -----------------------------------------------------------------------------
+# REQUIRED APIS
+# -----------------------------------------------------------------------------
+
+resource "google_project_service" "trafficdirector" {
+  service            = "trafficdirector.googleapis.com"
+  disable_on_destroy = false
+}
+
+resource "google_project_service" "compute" {
+  service            = "compute.googleapis.com"
+  disable_on_destroy = false
+}
+
+# -----------------------------------------------------------------------------
 # HEALTH CHECK
 # -----------------------------------------------------------------------------
 
@@ -213,4 +227,45 @@ module "traffic_director" {
     environment = var.environment
     service     = "redis"
   }
+
+  depends_on = [
+    google_project_service.trafficdirector,
+    google_project_service.compute,
+  ]
+}
+
+# -----------------------------------------------------------------------------
+# ENVOY CLIENT (for testing Traffic Director xDS configuration)
+# -----------------------------------------------------------------------------
+
+resource "google_compute_instance" "client" {
+  name         = "${var.name_prefix}-client"
+  machine_type = "e2-medium"
+  zone         = "${var.region}-b"
+
+  boot_disk {
+    initialize_params {
+      image = data.google_compute_image.ubuntu.self_link
+    }
+  }
+
+  network_interface {
+    network = var.network
+  }
+
+  service_account {
+    scopes = ["cloud-platform"]
+  }
+
+  tags = ["${var.name_prefix}-client"]
+
+  metadata_startup_script = templatefile("${path.module}/client_startup.sh", {
+    PROJECT_NUMBER = data.google_project.current.number
+    NETWORK_NAME   = var.network
+    ZONE           = "${var.region}-b"
+    BS_ID_READ     = module.traffic_director["${var.name_prefix}-read"].backend_service.generated_id
+    BS_ID_WRITE    = module.traffic_director["${var.name_prefix}-write"].backend_service.generated_id
+  })
+
+  depends_on = [module.traffic_director]
 }

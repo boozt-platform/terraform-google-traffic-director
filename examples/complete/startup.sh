@@ -10,9 +10,10 @@ apt-get update && apt-get install -y redis-server python3
 systemctl stop redis-server
 systemctl disable redis-server
 
-# Create directories
+# Create directories and log files
 mkdir -p /var/lib/redis/6379 /var/lib/redis/6380 /var/run/redis
-chown -R redis:redis /var/lib/redis /var/run/redis
+touch /var/log/redis_6379.log /var/log/redis_6380.log
+chown -R redis:redis /var/lib/redis /var/run/redis /var/log/redis_*.log
 
 # Configure Redis instances
 for PORT in 6379 6380; do

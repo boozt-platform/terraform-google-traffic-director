@@ -37,3 +37,17 @@ output "envoy_cluster_names" {
     for k, v in module.traffic_director : k => "cloud-internal-istio:cloud_mp_${data.google_project.current.number}_${v.backend_service.generated_id}"
   }
 }
+
+output "client_instance" {
+  description = "The Envoy client instance details"
+  value = {
+    name = google_compute_instance.client.name
+    zone = google_compute_instance.client.zone
+    ip   = google_compute_instance.client.network_interface[0].network_ip
+  }
+}
+
+output "project_id" {
+  description = "The GCP project ID"
+  value       = var.project_id
+}
