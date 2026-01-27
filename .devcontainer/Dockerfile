@@ -11,7 +11,7 @@ RUN apt-get update && \
         gnupg \
         apt-transport-https \
         ca-certificates && \
-    pip3 install --no-cache-dir --break-system-packages yamllint && \
+    pip3 install --no-cache-dir --break-system-packages yamllint checkov && \
     # Install Google Cloud SDK
     curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg && \
     echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee /etc/apt/sources.list.d/google-cloud-sdk.list && \

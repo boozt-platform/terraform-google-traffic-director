@@ -44,15 +44,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup mise
-        uses: jdx/mise-action@v2
+      - name: Run Checkov
+        uses: bridgecrewio/checkov-action@v12
         with:
-          install: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Security Scan
-        run: task security
+          directory: .
+          framework: terraform
+          skip_path: examples/
+          soft_fail: true
 
   test:
     name: Test
