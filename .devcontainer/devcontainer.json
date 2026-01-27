@@ -32,7 +32,8 @@
     },
     "mounts": [
         "source=vscode-data,target=/root/.vscode-server,type=volume",
-        "source=${localEnv:HOME}/.claude,target=/root/.claude,type=bind,consistency=cached"
+        "source=${localEnv:HOME}/.claude,target=/root/.claude,type=bind,consistency=cached",
+        "source=${localEnv:HOME}/.config/gcloud,target=/root/.config/gcloud,type=bind,consistency=cached"
     ],
     "postCreateCommand": "mise trust && lefthook install"
 }

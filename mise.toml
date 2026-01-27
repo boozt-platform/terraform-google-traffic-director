@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: MIT
 
 [tools]
-terraform = "1.10"
-tflint = "0.55"
-tfsec = "1.28"
-terraform-docs = "0.19"
-task = "3.40"
-lefthook = "1.11"
+terraform = "1.14"
+tflint = "0.60"
+checkov = "latest"
+terraform-docs = "0.21"
+task = "3.48"
+lefthook = "2.0"
 node = "22"
 "npm:markdownlint-cli" = "latest"
 claude = "latest"
