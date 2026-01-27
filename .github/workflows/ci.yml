@@ -1,0 +1,73 @@
+# SPDX-FileCopyrightText: Copyright Boozt Fashion, AB
+# SPDX-License-Identifier: MIT
+---
+name: CI
+
+"on":
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  terraform:
+    name: Terraform
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup mise
+        uses: jdx/mise-action@v2
+        with:
+          install: true
+
+      - name: Terraform Format
+        run: task fmt:check
+
+      - name: Terraform Validate
+        run: task validate
+
+      - name: Terraform Lint
+        run: task lint
+
+      - name: Terraform Security
+        run: task sec:soft
+
+      - name: Terraform Docs
+        run: task docs:check
+
+      - name: Terraform Test
+        run: task test
+
+  examples:
+    name: Validate Examples
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    strategy:
+      matrix:
+        example:
+          - complete
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup mise
+        uses: jdx/mise-action@v2
+        with:
+          install: true
+
+      - name: Validate ${{ matrix.example }}
+        run: task example:validate -- ${{ matrix.example }}
