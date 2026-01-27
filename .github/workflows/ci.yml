@@ -29,6 +29,8 @@ jobs:
         uses: jdx/mise-action@v2
         with:
           install: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Validate
         run: task validate
@@ -46,6 +48,8 @@ jobs:
         uses: jdx/mise-action@v2
         with:
           install: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Security Scan
         run: task security
@@ -63,6 +67,8 @@ jobs:
         uses: jdx/mise-action@v2
         with:
           install: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Test
         run: task test
@@ -80,6 +86,8 @@ jobs:
         uses: jdx/mise-action@v2
         with:
           install: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check Docs
         run: task docs -- --check
