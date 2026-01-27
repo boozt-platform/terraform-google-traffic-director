@@ -1,0 +1,39 @@
+{
+    "name": "terraform-google-traffic-director",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": ".."
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/common-utils:2": {
+            "installZsh": "true",
+            "configureZshAsDefaultShell": "true",
+            "upgradePackages": "false",
+            "username": "root"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "hashicorp.terraform",
+                "taskfile.vscode-task",
+                "ms-azuretools.vscode-docker",
+                "eamodio.gitlens",
+                "yzhang.markdown-all-in-one",
+                "be5invis.toml",
+                "hashicorp.hcl",
+                "anthropic.claude-code"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "zsh",
+                "dev.containers.copyGitConfig": true
+            }
+        }
+    },
+    "mounts": [
+        "source=vscode-data,target=/root/.vscode-server,type=volume",
+        "source=${localEnv:HOME}/.claude,target=/root/.claude,type=bind,consistency=cached",
+        "source=${localEnv:HOME}/.config/gcloud,target=/root/.config/gcloud,type=bind,consistency=cached"
+    ],
+    "postCreateCommand": "mise trust && lefthook install"
+}

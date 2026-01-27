@@ -1,3 +1,8 @@
+# Terraform module
+*.tf @boozt-platform/owners
+/examples/ @boozt-platform/owners
+/tests/ @boozt-platform/owners
+
 # docs documentation
 /docs/CODE_OF_CONDUCT.md @boozt-platform/owners
 /docs/CODEOWNERS.md @boozt-platform/owners

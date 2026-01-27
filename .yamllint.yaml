@@ -10,3 +10,8 @@ yaml-files:
   - '*.yml'
   - '.yamllint'
   - '.yamllint.yaml'
+
+ignore:
+  - .claude/
+  - .gemini/
+  - .terraform/

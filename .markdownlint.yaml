@@ -68,14 +68,16 @@ MD013:
   code_block_line_length: 80
   # Include code blocks
   code_blocks: true
-  # Include tables
-  tables: true
+  # Include tables (disabled for terraform-docs generated tables)
+  tables: false
   # Include headings
   headings: true
   # Strict length checking
   strict: false
   # Stern length checking
   stern: false
+# MD060/table-column-style: Disabled for terraform-docs compatibility
+MD060: false
 # MD014/commands-show-output: Dollar signs used before commands without showing
 # output : https://github.com/DavidAnson/markdownlint/blob/v0.33.0/doc/md014.md
 MD014: true
@@ -155,8 +157,12 @@ MD032: true
 # MD033/no-inline-html: Inline HTML:
 # https://github.com/DavidAnson/markdownlint/blob/v0.33.0/doc/md033.md
 MD033:
-  # Allowed elements
-  allowed_elements: []
+  # Allowed elements (terraform-docs generates these)
+  allowed_elements:
+    - a
+    - br
+    - pre
+    - img
 # MD034/no-bare-urls: Bare URL used:
 # https://github.com/DavidAnson/markdownlint/blob/v0.33.0/doc/md034.md
 MD034: true
@@ -190,11 +196,8 @@ MD040:
 # MD041/first-line-heading/first-line-h1 : First line in a file should
 # be a top-level heading:
 # https://github.com/DavidAnson/markdownlint/blob/v0.33.0/doc/md041.md
-MD041:
-  # Heading level
-  level: 1
-  # RegExp for matching title in front matter
-  front_matter_title: "^\\s*title\\s*[:=]"
+# Disabled: Our README starts with a logo image
+MD041: false
 # MD042/no-empty-links: No empty links:
 # https://github.com/DavidAnson/markdownlint/blob/v0.33.0/doc/md042.md
 MD042: true
@@ -212,7 +215,8 @@ MD044:
   html_elements: true
 # MD045/no-alt-text: Images should have alternate text (alt text):
 # https://github.com/DavidAnson/markdownlint/blob/v0.33.0/doc/md045.md
-MD045: true
+# Disabled: Logo uses inline HTML img tag
+MD045: false
 # MD046/code-block-style: Code block style:
 # https://github.com/DavidAnson/markdownlint/blob/v0.33.0/doc/md046.md
 MD046:
@@ -276,3 +280,5 @@ MD055:
 # MD056/table-column-count: Table column count:
 # https://github.com/DavidAnson/markdownlint/blob/v0.33.0/doc/md056.md
 MD056: true
+# MD059/descriptive-link-text: Disabled for template docs
+MD059: false

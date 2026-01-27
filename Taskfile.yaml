@@ -1,0 +1,84 @@
+# SPDX-FileCopyrightText: Copyright Boozt Fashion, AB
+# SPDX-License-Identifier: MIT
+---
+version: '3'
+
+tasks:
+  default:
+    desc: "Show available tasks"
+    cmds:
+      - task --list
+
+  init:
+    desc: "Initialize Terraform. Usage: task init [-- path]"
+    vars:
+      DIR: '{{.DIR | default (.CLI_ARGS | default ".")}}'
+    cmds:
+      - terraform -chdir={{.DIR}} init -backend=false
+
+  fmt:
+    desc: "Format all Terraform files"
+    cmds:
+      - terraform fmt -recursive
+
+  lint:
+    desc: "Run all linters (tflint, yamllint, markdownlint)"
+    cmds:
+      - tflint --init
+      - tflint
+      - yamllint -c .yamllint.yaml .
+      - markdownlint --config .markdownlint.yaml "**/*.md"
+
+  validate:
+    desc: "Validate Terraform configuration (fmt, validate, lint)"
+    cmds:
+      - terraform fmt -check -recursive
+      - task: init
+      - terraform validate
+      - task: lint
+
+  security:
+    desc: "Run security scan with Checkov"
+    cmds:
+      - checkov -d . --framework terraform --soft-fail
+
+  test:
+    desc: "Run unit tests (fast, no GCP credentials needed)"
+    deps: [init]
+    cmds:
+      - terraform test
+
+  docs:
+    desc: "Generate docs. Usage: task docs [-- --check]"
+    vars:
+      CHECK: '{{if eq .CLI_ARGS "--check"}}--output-check{{end}}'
+    cmds:
+      - >-
+        terraform-docs markdown table
+        --output-file README.md
+        --output-mode inject .
+        {{.CHECK}}
+
+  ci:
+    desc: "Run all CI checks"
+    cmds:
+      - task: validate
+      - task: security
+      - task: test
+      - task: docs
+        vars:
+          CLI_ARGS: "--check"
+
+  clean:
+    desc: "Clean up generated files"
+    cmds:
+      - rm -rf .terraform
+      - rm -f .terraform.lock.hcl
+      - rm -f terraform.tfstate*
+      - rm -rf examples/*/.terraform
+      - rm -f examples/*/.terraform.lock.hcl
+
+  hooks:
+    desc: "Install git hooks with lefthook"
+    cmds:
+      - lefthook install
