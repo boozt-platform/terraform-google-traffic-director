@@ -103,8 +103,7 @@ resource "google_project_service" "compute" {
 
 ```hcl
 module "redis_read" {
-  source  = "boozt-platform/traffic-director/google"
-  version = "~> 1.0"
+  source = "github.com/boozt-platform/terraform-google-traffic-director?ref=v1.1.0"
 
   project_id = "my-project"
   network    = "default"
@@ -127,8 +126,7 @@ module "redis_read" {
 
 ```hcl
 module "redis_write" {
-  source  = "boozt-platform/traffic-director/google"
-  version = "~> 1.0"
+  source = "github.com/boozt-platform/terraform-google-traffic-director?ref=v1.1.0"
 
   project_id = "my-project"
   network    = "default"
