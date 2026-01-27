@@ -5,48 +5,37 @@ remotes:
   - git_url: https://github.com/boozt-platform/lefthook.git
     ref: v1.5.0
     configs:
-      # lint commit messages based by the conventional commits
       - hooks/commitlint/.lefthook.yaml
-      # check if the license headers are present in the files
       - hooks/license-checker/.lefthook.yaml
 
-# All hooks using binaries (installed via mise)
 pre-commit:
-  parallel: false
+  parallel: true
   commands:
-    # Terraform
     terraform_fmt:
       glob: "*.tf"
-      priority: 1
-      tags: [terraform, lint]
-      run: task fmt:check
+      tags: [terraform]
+      run: terraform fmt -check -recursive
 
     terraform_validate:
       glob: "*.tf"
-      priority: 2
-      tags: [terraform, lint]
-      run: task validate
+      tags: [terraform]
+      run: terraform init -backend=false && terraform validate
 
     terraform_docs:
       skip:
         - run: test ! -f ".terraform-docs.yml"
       stage_fixed: true
-      priority: 3
-      tags: [terraform, docs]
+      tags: [terraform]
       run: task docs
 
-    # Markdown
     markdown-lint:
       glob: "*.md"
-      priority: 4
-      tags: [markdown, lint]
+      tags: [lint]
       run: markdownlint --config .markdownlint.yaml {staged_files}
 
-    # YAML
     yamllint:
       glob: "*.{yaml,yml}"
-      priority: 5
-      tags: [yaml, lint]
+      tags: [lint]
       run: yamllint -c .yamllint.yaml {staged_files}
 
 pre-push:
