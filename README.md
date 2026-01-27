@@ -15,6 +15,7 @@ architectures using Envoy sidecars with Managed Instance Groups (MIGs).
 
 - [Features](#features)
 - [Architecture](#architecture)
+- [Prerequisites](#prerequisites)
 - [Usage](#usage)
 - [Requirements](#requirements)
 - [Inputs](#inputs)
@@ -67,6 +68,33 @@ flowchart TB
     TP --> BS
     BS --> IG1
     BS --> IG2
+```
+
+## Prerequisites
+
+The following Google Cloud APIs must be enabled on your project:
+
+- `trafficdirector.googleapis.com` - Traffic Director API
+- `compute.googleapis.com` - Compute Engine API
+
+You can enable them using gcloud:
+
+```bash
+gcloud services enable trafficdirector.googleapis.com compute.googleapis.com
+```
+
+Or using Terraform:
+
+```hcl
+resource "google_project_service" "trafficdirector" {
+  service            = "trafficdirector.googleapis.com"
+  disable_on_destroy = false
+}
+
+resource "google_project_service" "compute" {
+  service            = "compute.googleapis.com"
+  disable_on_destroy = false
+}
 ```
 
 ## Usage
