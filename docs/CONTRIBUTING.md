@@ -7,6 +7,7 @@ outlined below:
 
 1. [Opening a GitHub Issue](#opening-a-github-issue)
 1. [Forking the Repository](#forking-the-repository)
+1. [Development Environment](#development-environment)
 1. [Updating Documentation](#updating-documentation)
 1. [Updating Tests](#updating-tests)
 1. [Updating Code](#updating-code)
@@ -32,6 +33,38 @@ branch as described in the [GitHub Flow][github-flow]. This will create a copy
 of the project in your GitHub account where you can make changes without
 affecting the original repository.
 
+## Development Environment
+
+This project provides a **devcontainer** for a consistent development
+environment. The devcontainer includes all required tools pre-installed:
+
+- Terraform
+- TFLint
+- Checkov (security scanning)
+- terraform-docs
+- Task (task runner)
+- Lefthook (git hooks)
+- yamllint / markdownlint
+
+### Getting Started
+
+1. Open the project in VS Code with the Dev Containers extension installed
+2. Click "Reopen in Container" when prompted
+3. Run `task --list` to see available commands
+
+### Available Tasks
+
+| Task | Description |
+| ---- | ----------- |
+| `task init` | Initialize Terraform |
+| `task fmt` | Format Terraform files |
+| `task lint` | Run all linters |
+| `task validate` | Validate configuration |
+| `task security` | Run security scan with Checkov |
+| `task test` | Run unit tests |
+| `task docs` | Generate documentation |
+| `task ci` | Run all CI checks |
+
 ## Updating Documentation
 
 Documentation is crucial for understanding and using the project effectively.
@@ -46,12 +79,37 @@ Please follow [Readme Driven Development][rdd].
 Maintaining a robust test suite is essential for ensuring the reliability and
 stability of the project.
 
+### Requirements
+
+- **All tests must pass** - Run `task ci` before submitting a PR to ensure all
+  checks pass
+- **New features must be covered by tests** - Add unit tests in `tests/` for
+  any new functionality
+- **Provide examples** - New features should include an example in `examples/`
+  demonstrating the use case
+
+### Running Tests
+
+```bash
+# Run all CI checks (recommended before submitting PR)
+task ci
+
+# Run only unit tests
+task test
+
+# Run security scan
+task security
+```
+
+### Test Structure
+
+- `tests/` - Unit tests using Terraform's native testing framework with mock
+  providers (no GCP credentials required)
+- `examples/` - Working examples that can be deployed for integration testing
+
 If you make changes to the code, please update any relevant tests to reflect
 those changes. This helps prevent regressions and ensures that the project
 continues to function as expected (see [TDD][tdd]).
-
-The test folder (if provided) in repository will have documentation guideline
-how to run the tests.
 
 ## Updating Code
 
