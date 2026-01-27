@@ -16,12 +16,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  terraform:
-    name: Terraform
+  validate:
+    name: Validate
     runs-on: ubuntu-latest
     permissions:
       contents: read
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -31,35 +30,14 @@ jobs:
         with:
           install: true
 
-      - name: Terraform Format
-        run: task fmt:check
-
-      - name: Terraform Validate
+      - name: Validate
         run: task validate
 
-      - name: Terraform Lint
-        run: task lint
-
-      - name: Terraform Security
-        run: task sec:soft
-
-      - name: Terraform Docs
-        run: task docs:check
-
-      - name: Terraform Test
-        run: task test
-
-  examples:
-    name: Validate Examples
+  security:
+    name: Security
     runs-on: ubuntu-latest
     permissions:
       contents: read
-
-    strategy:
-      matrix:
-        example:
-          - complete
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -69,5 +47,39 @@ jobs:
         with:
           install: true
 
-      - name: Validate ${{ matrix.example }}
-        run: task example:validate -- ${{ matrix.example }}
+      - name: Security Scan
+        run: task security
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup mise
+        uses: jdx/mise-action@v2
+        with:
+          install: true
+
+      - name: Test
+        run: task test
+
+  docs:
+    name: Docs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup mise
+        uses: jdx/mise-action@v2
+        with:
+          install: true
+
+      - name: Check Docs
+        run: task docs -- --check
