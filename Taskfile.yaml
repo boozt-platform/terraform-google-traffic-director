@@ -1,0 +1,195 @@
+# SPDX-FileCopyrightText: Copyright Boozt Fashion, AB
+# SPDX-License-Identifier: MIT
+---
+version: '3'
+
+tasks:
+  default:
+    desc: "Show available tasks"
+    cmds:
+      - task --list
+
+  # ============================================================================
+  # Development Tasks
+  # ============================================================================
+  init:
+    desc: "Initialize Terraform (no backend)"
+    cmds:
+      - terraform init -backend=false
+
+  fmt:
+    desc: "Format all Terraform files"
+    cmds:
+      - terraform fmt -recursive
+
+  fmt:check:
+    desc: "Check Terraform formatting"
+    cmds:
+      - terraform fmt -check -recursive
+
+  validate:
+    desc: "Validate Terraform configuration"
+    deps: [init]
+    cmds:
+      - terraform validate
+
+  # ============================================================================
+  # Linting & Security
+  # ============================================================================
+  lint:
+    desc: "Run tflint"
+    cmds:
+      - tflint --init
+      - tflint
+
+  lint:fix:
+    desc: "Run tflint with autofix"
+    cmds:
+      - tflint --init
+      - tflint --fix
+
+  lint:yaml:
+    desc: "Lint YAML files"
+    cmds:
+      - yamllint -c .yamllint.yaml .
+
+  lint:md:
+    desc: "Lint Markdown files"
+    cmds:
+      - markdownlint --config .markdownlint.yaml "**/*.md"
+
+  lint:all:
+    desc: "Run all linters (terraform, yaml, markdown)"
+    cmds:
+      - task: lint
+      - task: lint:yaml
+      - task: lint:md
+
+  sec:
+    desc: "Run tfsec security scan"
+    cmds:
+      - tfsec .
+
+  sec:soft:
+    desc: "Run tfsec (warnings only, no errors)"
+    cmds:
+      - tfsec . --soft-fail
+
+  # ============================================================================
+  # Testing
+  # ============================================================================
+  test:
+    desc: "Run all Terraform tests"
+    deps: [init]
+    cmds:
+      - terraform test
+
+  test:verbose:
+    desc: "Run Terraform tests with verbose output"
+    deps: [init]
+    cmds:
+      - terraform test -verbose
+
+  test:filter:
+    desc: "Run specific test file. Usage: task test:filter -- validation"
+    deps: [init]
+    vars:
+      FILTER: '{{.CLI_ARGS | default "main"}}'
+    cmds:
+      - terraform test -filter=tests/{{.FILTER}}.tftest.hcl
+
+  # ============================================================================
+  # Documentation
+  # ============================================================================
+  docs:
+    desc: "Generate documentation with terraform-docs"
+    cmds:
+      - >-
+        terraform-docs markdown table
+        --output-file README.md
+        --output-mode inject .
+
+  docs:check:
+    desc: "Check if documentation is up-to-date"
+    cmds:
+      - >-
+        terraform-docs markdown table
+        --output-file README.md
+        --output-mode inject .
+        --output-check
+
+  # ============================================================================
+  # Examples
+  # ============================================================================
+  example:init:
+    desc: "Initialize example. Usage: task example:init -- complete"
+    dir: "examples/{{.CLI_ARGS}}"
+    cmds:
+      - terraform init -backend=false
+
+  example:validate:
+    desc: "Validate example. Usage: task example:validate -- complete"
+    dir: "examples/{{.CLI_ARGS}}"
+    cmds:
+      - terraform init -backend=false
+      - terraform validate
+
+  example:fmt:
+    desc: "Format example files"
+    cmds:
+      - terraform fmt -recursive examples/
+
+  # ============================================================================
+  # CI/CD Tasks
+  # ============================================================================
+  ci:
+    desc: "Run all CI checks (fmt, validate, lint, sec, test)"
+    cmds:
+      - task: fmt:check
+      - task: validate
+      - task: lint
+      - task: sec:soft
+      - task: test
+      - task: docs:check
+
+  ci:quick:
+    desc: "Run quick CI checks (fmt, validate)"
+    cmds:
+      - task: fmt:check
+      - task: validate
+
+  # ============================================================================
+  # Utility Tasks
+  # ============================================================================
+  clean:
+    desc: "Clean up generated files"
+    cmds:
+      - rm -rf .terraform
+      - rm -f .terraform.lock.hcl
+      - rm -f terraform.tfstate*
+      - rm -rf examples/*/.terraform
+      - rm -f examples/*/.terraform.lock.hcl
+
+  hooks:install:
+    desc: "Install git hooks with lefthook"
+    cmds:
+      - lefthook install
+
+  hooks:run:
+    desc: "Run all pre-commit hooks"
+    cmds:
+      - lefthook run pre-commit
+
+  upgrade:
+    desc: "Upgrade provider versions"
+    cmds:
+      - terraform init -upgrade
+
+  # ============================================================================
+  # Release Tasks
+  # ============================================================================
+  release:check:
+    desc: "Check if ready for release"
+    cmds:
+      - task: ci
+      - echo "All checks passed! Ready for release."
