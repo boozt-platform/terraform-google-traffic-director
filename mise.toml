@@ -4,7 +4,7 @@
 [tools]
 terraform = "1.14"
 tflint = "0.60"
-checkov = "3.2"
+checkov = "3.2.499"
 terraform-docs = "0.21"
 task = "3.48"
 lefthook = "2.0"
