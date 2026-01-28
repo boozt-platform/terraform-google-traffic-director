@@ -39,8 +39,14 @@ pre-commit:
       run: yamllint -c .yamllint.yaml {staged_files}
 
 pre-push:
+  parallel: true
   commands:
     terraform_test:
       glob: "*.tf"
       tags: [terraform, test]
       run: task test
+
+    terraform_docs:
+      glob: "*.tf"
+      tags: [terraform]
+      run: task docs -- --check
