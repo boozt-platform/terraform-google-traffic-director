@@ -189,7 +189,7 @@ variable "max_connections_per_instance" {
 }
 
 variable "create_forwarding_rule" {
-  description = "Whether to create the forwarding rule and TCP proxy. Set to false when another service already owns the forwarding rule for the same port (e.g., shared port between instance groups using static Envoy listeners with dynamic CDS)."
+  description = "Whether to create the forwarding rule and TCP proxy. Set to false if forwarding rule is not required."
   type        = bool
   default     = true
 }
