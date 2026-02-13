@@ -189,15 +189,20 @@ variable "max_connections_per_instance" {
 }
 
 variable "create_forwarding_rule" {
-  description = "Whether to create the forwarding rule and TCP proxy. Set to false if forwarding rule is not required."
+  description = "Whether to create the forwarding rule and TCP proxy. Set to false to only create the backend service, allowing the user to manage their own forwarding rule externally. The backend_service output provides the necessary attributes for this purpose."
   type        = bool
   default     = true
 }
 
 variable "ip_address" {
-  description = "The IP address for the forwarding rule. Use '0.0.0.0' for the default mesh-wide listener, or a different address (e.g., '10.0.0.0') to avoid port conflicts when multiple backend services share the same port."
+  description = "The IP address for the forwarding rule. Use '0.0.0.0' for the default mesh-wide listener, or a reserved internal IP address to avoid port conflicts when multiple backend services share the same port. Only used when create_forwarding_rule is true."
   type        = string
   default     = "0.0.0.0"
+
+  validation {
+    condition     = can(cidrnetmask("${var.ip_address}/32"))
+    error_message = "IP address must be a valid IPv4 address (e.g., '0.0.0.0' or '10.100.1.5')."
+  }
 }
 
 variable "max_connections" {

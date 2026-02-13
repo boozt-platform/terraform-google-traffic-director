@@ -275,3 +275,43 @@ run "invalid_max_connections_negative" {
 
   expect_failures = [var.max_connections]
 }
+
+# -----------------------------------------------------------------------------
+# IP Address Validation Tests
+# -----------------------------------------------------------------------------
+
+run "valid_ip_address_default" {
+  command = plan
+
+  variables {
+    ip_address = "0.0.0.0"
+  }
+}
+
+run "valid_ip_address_internal" {
+  command = plan
+
+  variables {
+    ip_address = "10.100.1.5"
+  }
+}
+
+run "invalid_ip_address_text" {
+  command = plan
+
+  variables {
+    ip_address = "not-an-ip"
+  }
+
+  expect_failures = [var.ip_address]
+}
+
+run "invalid_ip_address_empty" {
+  command = plan
+
+  variables {
+    ip_address = ""
+  }
+
+  expect_failures = [var.ip_address]
+}

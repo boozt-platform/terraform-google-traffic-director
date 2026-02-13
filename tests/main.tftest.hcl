@@ -259,6 +259,23 @@ run "logging_enabled" {
 # Connection Limits Configuration Tests
 # -----------------------------------------------------------------------------
 
+run "custom_ip_address" {
+  command = plan
+
+  variables {
+    ip_address = "10.100.1.5"
+  }
+
+  assert {
+    condition     = google_compute_global_forwarding_rule.this[0].ip_address == "10.100.1.5"
+    error_message = "Forwarding rule should use custom IP address"
+  }
+}
+
+# -----------------------------------------------------------------------------
+# Connection Limits Configuration Tests
+# -----------------------------------------------------------------------------
+
 run "connection_limits_configuration" {
   command = plan
 
