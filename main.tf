@@ -64,15 +64,19 @@ resource "google_compute_backend_service" "this" {
 }
 
 resource "google_compute_target_tcp_proxy" "this" {
+  count = var.create_forwarding_rule ? 1 : 0
+
   project         = var.project_id
   name            = local.proxy_name
   backend_service = google_compute_backend_service.this.id
 }
 
 resource "google_compute_global_forwarding_rule" "this" {
+  count = var.create_forwarding_rule ? 1 : 0
+
   project               = var.project_id
   name                  = local.forwarding_rule_name
-  target                = google_compute_target_tcp_proxy.this.id
+  target                = google_compute_target_tcp_proxy.this[0].id
   port_range            = var.port_range
   load_balancing_scheme = "INTERNAL_SELF_MANAGED"
   network               = var.network
