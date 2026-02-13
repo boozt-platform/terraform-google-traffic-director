@@ -43,18 +43,50 @@ run "basic_configuration" {
   }
 
   assert {
-    condition     = google_compute_target_tcp_proxy.this.name == "test-service-proxy"
+    condition     = google_compute_target_tcp_proxy.this[0].name == "test-service-proxy"
     error_message = "TCP proxy name should be 'test-service-proxy'"
   }
 
   assert {
-    condition     = google_compute_global_forwarding_rule.this.name == "test-service"
+    condition     = google_compute_global_forwarding_rule.this[0].name == "test-service"
     error_message = "Forwarding rule name should be 'test-service'"
   }
 
   assert {
-    condition     = google_compute_global_forwarding_rule.this.port_range == "6379"
+    condition     = google_compute_global_forwarding_rule.this[0].port_range == "6379"
     error_message = "Forwarding rule port range should be '6379'"
+  }
+}
+
+# -----------------------------------------------------------------------------
+# Backend Service Only (no forwarding rule) Tests
+# -----------------------------------------------------------------------------
+
+run "backend_service_only" {
+  command = plan
+
+  variables {
+    create_forwarding_rule = false
+  }
+
+  assert {
+    condition     = google_compute_backend_service.this.name == "test-service-bs"
+    error_message = "Backend service should still be created"
+  }
+
+  assert {
+    condition     = google_compute_backend_service.this.load_balancing_scheme == "INTERNAL_SELF_MANAGED"
+    error_message = "Load balancing scheme should be INTERNAL_SELF_MANAGED"
+  }
+
+  assert {
+    condition     = length(google_compute_target_tcp_proxy.this) == 0
+    error_message = "TCP proxy should not be created when create_forwarding_rule is false"
+  }
+
+  assert {
+    condition     = length(google_compute_global_forwarding_rule.this) == 0
+    error_message = "Forwarding rule should not be created when create_forwarding_rule is false"
   }
 }
 
@@ -190,12 +222,12 @@ run "labels_configuration" {
   }
 
   assert {
-    condition     = google_compute_global_forwarding_rule.this.labels["environment"] == "test"
+    condition     = google_compute_global_forwarding_rule.this[0].labels["environment"] == "test"
     error_message = "Label 'environment' should be 'test'"
   }
 
   assert {
-    condition     = google_compute_global_forwarding_rule.this.labels["team"] == "platform"
+    condition     = google_compute_global_forwarding_rule.this[0].labels["team"] == "platform"
     error_message = "Label 'team' should be 'platform'"
   }
 }
@@ -220,6 +252,23 @@ run "logging_enabled" {
   assert {
     condition     = google_compute_backend_service.this.log_config[0].sample_rate == 0.5
     error_message = "Sample rate should be 0.5"
+  }
+}
+
+# -----------------------------------------------------------------------------
+# Connection Limits Configuration Tests
+# -----------------------------------------------------------------------------
+
+run "custom_ip_address" {
+  command = plan
+
+  variables {
+    ip_address = "10.100.1.5"
+  }
+
+  assert {
+    condition     = google_compute_global_forwarding_rule.this[0].ip_address == "10.100.1.5"
+    error_message = "Forwarding rule should use custom IP address"
   }
 }
 

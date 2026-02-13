@@ -97,6 +97,20 @@ resource "google_project_service" "compute" {
 }
 ```
 
+### Client IAM Permissions
+
+Clients (e.g., VMs running Envoy sidecars) require the `roles/trafficdirector.client`
+role to fetch cluster configurations from Traffic Director. Without this role,
+Envoy cannot retrieve the list of available backend services.
+
+```hcl
+resource "google_project_iam_member" "traffic_director_client" {
+  project = "my-project"
+  role    = "roles/trafficdirector.client"
+  member  = "serviceAccount:my-vm-service-account@my-project.iam.gserviceaccount.com"
+}
+```
+
 ## Usage
 
 ### Basic Example (Round-Robin)
@@ -192,6 +206,8 @@ module "redis_write" {
 | <a name="input_balancing_mode"></a> [balancing\_mode](#input\_balancing\_mode) | The balancing mode for backends. Use 'CONNECTION' for TCP traffic. | `string` | `"CONNECTION"` | no |
 | <a name="input_circuit_breakers"></a> [circuit\_breakers](#input\_circuit\_breakers) | Circuit breaker configuration for the backend service. | <pre>object({<br/>    max_connections      = optional(number)<br/>    max_pending_requests = optional(number)<br/>    max_requests         = optional(number)<br/>    max_retries          = optional(number)<br/>  })</pre> | `null` | no |
 | <a name="input_connection_draining_timeout_sec"></a> [connection\_draining\_timeout\_sec](#input\_connection\_draining\_timeout\_sec) | Time in seconds to wait for connections to drain when removing a backend. | `number` | `0` | no |
+| <a name="input_create_forwarding_rule"></a> [create\_forwarding\_rule](#input\_create\_forwarding\_rule) | Whether to create the forwarding rule and TCP proxy. Set to false to only create the backend service, allowing the user to manage their own forwarding rule externally. The backend\_service output provides the necessary attributes for this purpose. | `bool` | `true` | no |
+| <a name="input_ip_address"></a> [ip\_address](#input\_ip\_address) | The IP address for the forwarding rule. Use '0.0.0.0' for the default mesh-wide listener, or a reserved internal IP address to avoid port conflicts when multiple backend services share the same port. Only used when create\_forwarding\_rule is true. | `string` | `"0.0.0.0"` | no |
 | <a name="input_labels"></a> [labels](#input\_labels) | Labels to apply to the forwarding rule resource. | `map(string)` | `{}` | no |
 | <a name="input_locality_lb_policy"></a> [locality\_lb\_policy](#input\_locality\_lb\_policy) | The load balancing policy. Use 'ROUND\_ROBIN' for even distribution or 'RING\_HASH' for consistent hashing (sticky sessions). | `string` | `"ROUND_ROBIN"` | no |
 | <a name="input_log_config_enable"></a> [log\_config\_enable](#input\_log\_config\_enable) | Whether to enable logging for the backend service. | `bool` | `false` | no |
@@ -207,8 +223,8 @@ module "redis_write" {
 | Name | Description |
 |------|-------------|
 | <a name="output_backend_service"></a> [backend\_service](#output\_backend\_service) | The created backend service resource attributes. |
-| <a name="output_forwarding_rule"></a> [forwarding\_rule](#output\_forwarding\_rule) | The created forwarding rule resource attributes. |
-| <a name="output_tcp_proxy"></a> [tcp\_proxy](#output\_tcp\_proxy) | The created TCP proxy resource attributes. |
+| <a name="output_forwarding_rule"></a> [forwarding\_rule](#output\_forwarding\_rule) | The created forwarding rule resource attributes. Null when create\_forwarding\_rule is false. |
+| <a name="output_tcp_proxy"></a> [tcp\_proxy](#output\_tcp\_proxy) | The created TCP proxy resource attributes. Null when create\_forwarding\_rule is false. |
 <!-- END_TF_DOCS -->
 
 ## Examples
