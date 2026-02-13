@@ -194,6 +194,12 @@ variable "create_forwarding_rule" {
   default     = true
 }
 
+variable "ip_address" {
+  description = "The IP address for the forwarding rule. Use '0.0.0.0' for the default mesh-wide listener, or a different address (e.g., '10.0.0.0') to avoid port conflicts when multiple backend services share the same port."
+  type        = string
+  default     = "0.0.0.0"
+}
+
 variable "max_connections" {
   description = "Maximum number of simultaneous connections for the entire backend service."
   type        = number

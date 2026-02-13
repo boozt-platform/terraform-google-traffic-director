@@ -80,6 +80,6 @@ resource "google_compute_global_forwarding_rule" "this" {
   port_range            = var.port_range
   load_balancing_scheme = "INTERNAL_SELF_MANAGED"
   network               = var.network
-  ip_address            = "0.0.0.0"
+  ip_address            = var.ip_address
   labels                = var.labels
 }
